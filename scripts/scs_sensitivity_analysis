@@ -1,0 +1,61 @@
+import pandas as pd
+import numpy as np
+import os
+
+
+INPUT_FILE = "SCS_Master_Table_Publication.csv"
+
+if not os.path.exists(INPUT_FILE):
+    print(f"❌ Error: Could not find '{INPUT_FILE}' in the current directory.")
+    exit()
+
+print(f"📖 Reading '{INPUT_FILE}'...")
+df = pd.read_csv(INPUT_FILE)
+df.columns = [str(c).strip() for c in df.columns]
+
+
+scs_col = next((c for c in df.columns if c.upper() == 'SCS'), None)
+if not scs_col:
+    print("❌ Error: Could not find 'SCS' column in the dataset!")
+    exit()
+
+
+df[scs_col] = pd.to_numeric(df[scs_col], errors='coerce').fillna(0.0)
+
+print("\n⚙️ Generating Dataset 1 (Tier 1 = 0.60)...")
+df_060 = df.copy()
+
+conditions_060 = [
+    df_060[scs_col] >= 0.60,
+    (df_060[scs_col] >= 0.20) & (df_060[scs_col] <= 0.59),
+    df_060[scs_col] < 0.20
+]
+choices = ['Tier 1', 'Tier 2', 'Tier 3']
+
+df_060['Tier'] = np.select(conditions_060, choices, default='Tier 3')
+
+OUTPUT_060 = "SCS_Master_Table_0.60.csv"
+df_060.to_csv(OUTPUT_060, index=False)
+print(f"  └── Saved: '{OUTPUT_060}'")
+print("  └── Tier Breakdown:")
+print(df_060['Tier'].value_counts().to_string())
+
+
+print("\n⚙️ Generating Dataset 2 (Tier 1 = 0.80)...")
+df_080 = df.copy()
+
+conditions_080 = [
+    df_080[scs_col] >= 0.80,
+    (df_080[scs_col] >= 0.40) & (df_080[scs_col] <= 0.79),
+    df_080[scs_col] < 0.40
+]
+
+df_080['Tier'] = np.select(conditions_080, choices, default='Tier 3')
+
+OUTPUT_080 = "SCS_Master_Table_0.80.csv"
+df_080.to_csv(OUTPUT_080, index=False)
+print(f"  └── Saved: '{OUTPUT_080}'")
+print("  └── Tier Breakdown:")
+print(df_080['Tier'].value_counts().to_string())
+
+print("\n🎉 Done! Both sensitivity files created successfully.")
