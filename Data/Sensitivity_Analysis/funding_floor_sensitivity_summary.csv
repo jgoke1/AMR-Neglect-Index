@@ -1,0 +1,4 @@
+Scenario,Spearman_rho,Kendall_tau,Top_20_Overlap_Pct,Avg_Rank_Shift,Max_Rank_Shift
+Floor 0.001 (0.1%),0.955135,0.900741,100.0%,37.94,436
+Floor 0.01 (1.0%),0.53673,0.487644,100.0%,216.74,810
+Excluded (Zero Funding Removed),1.0,1.0,100.0%,0.0,0
