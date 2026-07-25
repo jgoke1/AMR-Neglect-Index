@@ -1,18 +1,4 @@
 """
-AMR Neglect Index - Step 6: R&D Funding Score Calculation (Updated)
-=====================================================================
-Calculates normalized R&D Funding Scores per (Country, Genus) using:
-  - Public Funding: 25%
-  - Private Funding: 25%
-  - Active Projects: 25%
-  - Funding Trend (OLS Slope): 15%
-  - Mixed/PPP Funding: 10%
-
-Fixes & Methods:
-  1. Saves original score file WITH Mycobacterium included.
-  2. Excludes Mycobacterium from global max calculation for surveillance pathogens.
-  3. Computes both Standard Min-Max AND Log-Transformed Min-Max for comparison.
-"""
 
 import os
 import numpy as np
@@ -74,9 +60,7 @@ def main():
     df_raw = pd.read_csv(INPUT_FILE)
     print(f"Loaded {len(df_raw)} country-genus records.")
 
-    # -------------------------------------------------------------------
     # PASS 1: Calculate Original Scores WITH Mycobacterium Included
-    # -------------------------------------------------------------------
     df_unfiltered = df_raw.copy()
     df_unfiltered["norm_public"] = min_max_scale(df_unfiltered["public_funding_usd"])
     df_unfiltered["norm_private"] = min_max_scale(df_unfiltered["private_funding_usd"])
@@ -89,9 +73,7 @@ def main():
     df_unfiltered.to_csv(OUTPUT_UNFILTERED, index=False)
     print(f"\n[Saved] Original Unfiltered Scores (With Mycobacterium): {OUTPUT_UNFILTERED}")
 
-    # -------------------------------------------------------------------
     # PASS 2: Exclude Mycobacterium for Surveillance Pathogens Calibration
-    # -------------------------------------------------------------------
     is_myco = df_raw["genus"].astype(str).str.strip().str.lower() == "mycobacterium"
     df_surv = df_raw[~is_myco].copy()
 
@@ -123,9 +105,9 @@ def main():
     df_surv.to_csv(OUTPUT_CLEAN_MINMAX, index=False)
     print(f"[Saved] Surveillance Min-Max Scores: {OUTPUT_CLEAN_MINMAX}")
 
-    # -------------------------------------------------------------------
+   
     # PASS 3: Generate Summary Comparison Table
-    # -------------------------------------------------------------------
+   
     cols_comp = [
         "institution_country", "genus", "total_funding_usd",
         "score_minmax_0_to_1", "score_log_0_to_1",
