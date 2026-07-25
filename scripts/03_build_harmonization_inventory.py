@@ -2,9 +2,6 @@ import pandas as pd
 from pathlib import Path
 import re
 
-# ============================================================
-# PROJECT PATHS
-# ============================================================
 
 ROOT = Path(__file__).resolve().parents[1]
 
