@@ -1,11 +1,4 @@
 """
-AMR Neglect Index - Interactive Dropdown Map & 100% Stacked Country Bar Chart
-=============================================================================
-1. Generates an interactive Plotly HTML choropleth map with a dropdown/animation frame 
-   for pathogen-drug combinations.
-2. Generates a publication-ready 100% stacked horizontal bar chart showing the tier 
-   proportions (Red, Orange, Green, Blue) across countries.
-"""
 
 import os
 import pandas as pd
