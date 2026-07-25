@@ -1,40 +1,10 @@
 """
-AMR Neglect Index - Funding Data Cleaning & Aggregation Pipeline (v5 - Genus Rollup)
-===================================================================================
-Cleans the Global AMR R&D Hub export and produces per-(country, genus) and 
-per-(country, species) master tables ready for Step 6 (R&D Funding Score) 
-and Step 7 (Neglect Index).
-
-FOLDER STRUCTURE EXPECTED:
-    FUNDING SCORE/                        <- project root
-        Data/
-            Projects Fuller.xlsx           <- Hub export
-            funders_classified.xlsx        <- manually classified funders
-        Output/                            <- created automatically
-        clean_funding_data.py              <- this file
-
-WHAT THIS PIPELINE DOES:
-1. Filters to Human-sector projects only.
-2. Extracts 'Institution Country' for spatial aggregation.
-3. Parses 'Categories' -> genus/family-level pathogen tags.
-4. Mines Title + Abstract for taxonomic species names using generic reference knowledge.
-5. Resolves final pathogen lists per project and splits funding evenly (fractional counting).
-6. Maps all resolved pathogens to their Genus level.
-7. Classifies Funder Name as Public / Private / Public-Private Partnership / Unclassified.
-8. Calculates the 2017-2024 Funding Trend Slope (OLS linear regression slope).
-9. Aggregates and exports complete master tables grouped by:
-   - (Institution Country, Genus) -> PRIMARY FILE FOR STEP 6 & 7
-   - (Institution Country, Species) -> FINE-GRAINED REFERENCE
-"""
 
 import os
 import re
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
-# CONFIGURATION
-# ---------------------------------------------------------------------------
 
 INPUT_FILE = os.path.join("Data", "Projects Fuller.xlsx")
 FUNDER_REFERENCE_FILE = os.path.join("Data", "funders_classified.xlsx")
@@ -108,10 +78,6 @@ SPECIES_EPITHET_STOPWORDS = {
     "samples", "study", "studies", "group", "groups", "type", "types",
     "produces", "producing", "produced", "causing", "cause", "causes",
 }
-
-# ---------------------------------------------------------------------------
-# HELPER FUNCTIONS
-# ---------------------------------------------------------------------------
 
 def extract_genus(pathogen_name: str) -> str:
     """
@@ -300,9 +266,6 @@ def calculate_ols_slope(group_df):
     
     return float(num / den) if den != 0 else 0.0
 
-# ---------------------------------------------------------------------------
-# MAIN PIPELINE
-# ---------------------------------------------------------------------------
 
 def run_pipeline(input_path, funder_reference_path):
     df = pd.read_excel(input_path)
@@ -391,9 +354,7 @@ def run_pipeline(input_path, funder_reference_path):
     excluded_df = pd.DataFrame(excluded_log)
 
     if not exploded_df.empty:
-        # -------------------------------------------------------------------
-        # 1. PRIMARY MASTER TABLE: Grouped by (institution_country, GENUS)
-        # -------------------------------------------------------------------
+       
         agg_country_genus = exploded_df.groupby(["institution_country", "genus"]).agg(
             total_funding_usd=("amount_usd_split", "sum"),
             public_funding_usd=("amount_usd_split", lambda s: s[exploded_df.loc[s.index, "funder_type"] == "Public"].sum()),
@@ -413,9 +374,6 @@ def run_pipeline(input_path, funder_reference_path):
         agg_country_genus = agg_country_genus.merge(slopes_genus, on=["institution_country", "genus"], how="left")
         agg_country_genus.sort_values(["institution_country", "total_funding_usd"], ascending=[True, False], inplace=True)
 
-        # -------------------------------------------------------------------
-        # 2. REFERENCE MASTER TABLE: Grouped by (institution_country, PATHOGEN/SPECIES)
-        # -------------------------------------------------------------------
         agg_country_species = exploded_df.groupby(["institution_country", "pathogen"]).agg(
             total_funding_usd=("amount_usd_split", "sum"),
             public_funding_usd=("amount_usd_split", lambda s: s[exploded_df.loc[s.index, "funder_type"] == "Public"].sum()),
@@ -432,9 +390,6 @@ def run_pipeline(input_path, funder_reference_path):
         agg_country_species = agg_country_species.merge(slopes_species, on=["institution_country", "pathogen"], how="left")
         agg_country_species.sort_values(["institution_country", "total_funding_usd"], ascending=[True, False], inplace=True)
 
-        # -------------------------------------------------------------------
-        # 3. GLOBAL SUMMARY TABLE (By Genus)
-        # -------------------------------------------------------------------
         agg_global_genus = exploded_df.groupby("genus").agg(
             total_funding_usd=("amount_usd_split", "sum"),
             public_funding_usd=("amount_usd_split", lambda s: s[exploded_df.loc[s.index, "funder_type"] == "Public"].sum()),
