@@ -1,7 +1,3 @@
-# ==========================================================
-# SCRIPT 08
-# PUBLICATION-QUALITY SCS VISUALIZATIONS
-# ==========================================================
 
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,9 +6,6 @@ from pathlib import Path
 
 plt.style.use("ggplot")
 
-# ==========================================================
-# FOLDERS
-# ==========================================================
 
 BASE_FOLDER = Path(
     r"C:\Users\BRIDGET\Documents\Bridget\VIVLI 2026\Surveillance Capacity Score"
@@ -24,9 +17,6 @@ INPUT_FILE = OUTPUT_FOLDER / "SCS_master_table.csv"
 
 OUTPUT_FOLDER.mkdir(exist_ok=True)
 
-# ==========================================================
-# LOAD SCS TABLE
-# ==========================================================
 
 print("=" * 60)
 print("GENERATING PUBLICATION-QUALITY SCS FIGURES")
@@ -36,9 +26,6 @@ scs = pd.read_csv(INPUT_FILE)
 
 print(f"\nLoaded {len(scs)} countries.")
 
-# ==========================================================
-# BASIC CLEANING
-# ==========================================================
 
 scs["Country"] = (
     scs["Country"]
@@ -53,10 +40,6 @@ scs["SCS"] = pd.to_numeric(
 
 scs = scs.dropna(subset=["Country", "SCS"])
 
-# ==========================================================
-# STANDARDIZE COUNTRY NAMES
-# (used for plotting only; DOES NOT change your SCS table)
-# ==========================================================
 
 country_fix = {
 
@@ -109,9 +92,6 @@ scs["MapCountry"] = (
     .replace(country_fix)
 )
 
-# ==========================================================
-# SORT FOR PLOTS
-# ==========================================================
 
 scs = (
     scs
@@ -120,9 +100,7 @@ scs = (
 )
 
 print(f"Countries available for plotting: {len(scs)}")
-# ==========================================================
-# HISTOGRAM OF SCS DISTRIBUTION
-# ==========================================================
+
 
 print("\nGenerating histogram...")
 
@@ -171,10 +149,6 @@ plt.close()
 
 print("✓ Histogram created.")
 
-
-# ------------------------------------------------------
-# Ranked horizontal bar chart
-# ------------------------------------------------------
 
 plot_df = scs.sort_values("SCS")
 
@@ -271,9 +245,6 @@ plt.close()
 print("✓ Ranked country plot created.")
 
 
-# ==========================================================
-# TIER SUMMARY
-# ==========================================================
 
 tier_summary = (
     scs["Tier"]
@@ -299,9 +270,6 @@ print("\nTier Summary")
 print(tier_summary_df)
 
 print(f"\nTier summary saved to:\n{tier_summary_file}")
-# ==========================================================
-# PUBLICATION-QUALITY WORLD MAP (ISO-3 MATCHING)
-# ==========================================================
 
 print("\nGenerating publication-quality world map...")
 
@@ -309,10 +277,7 @@ try:
 
     import pycountry
 
-    # ------------------------------------------------------
-    # Convert country names to ISO-3 codes
-    # ------------------------------------------------------
-
+   
     def get_iso3(country):
 
         if pd.isna(country):
@@ -321,19 +286,16 @@ try:
         country = str(country).strip()
 
         manual = {
-
-    # ============================
+            
     # United States
-    # ============================
-
+   
     "USA": "USA",
     "U.S.A.": "USA",
     "United States": "USA",
     "United States of America": "USA",
 
-    # ============================
+   
     # United Kingdom
-    # ============================
 
     "UK": "GBR",
     "U.K.": "GBR",
@@ -341,10 +303,8 @@ try:
     "Great Britain": "GBR",
     "England": "GBR",
 
-    # ============================
     # Korea
-    # ============================
-
+    
     "South Korea": "KOR",
     "Republic of Korea": "KOR",
     "Korea, South": "KOR",
@@ -352,9 +312,8 @@ try:
     "North Korea": "PRK",
     "Democratic People's Republic of Korea": "PRK",
 
-    # ============================
     # China / Taiwan
-    # ============================
+    
 
     "China": "CHN",
     "Mainland China": "CHN",
@@ -365,17 +324,13 @@ try:
     "Hong Kong": "HKG",
     "Hong Kong SAR": "HKG",
 
-    # ============================
     # Czech Republic
-    # ============================
-
+   
     "Czech Republic": "CZE",
     "Czechia": "CZE",
 
-    # ============================
     # Russia
-    # ============================
-
+    
     "Russia": "RUS",
     "Russian Federation": "RUS",
 
@@ -504,10 +459,9 @@ try:
         for c in sorted(unmatched["Country"].unique()):
 
             print("  -", c)
-    # ------------------------------------------------------
+    
     # Load Natural Earth map
-    # ------------------------------------------------------
-
+   
     world = gpd.read_file(
     r"C:\Users\BRIDGET\Documents\Bridget\VIVLI 2026\Surveillance Capacity Score\World_Map\ne_110m_admin_0_countries.shp"
 )
@@ -585,9 +539,8 @@ except Exception as e:
 
     print(e)
 
-# ==========================================================
+
 # EXPORT PUBLICATION TABLE
-# ==========================================================
 
 publication = scs.sort_values(
 
@@ -607,9 +560,9 @@ publication.to_csv(
 
 print("✓ Publication table exported.")
 
-# ==========================================================
+
 # COMPLETION
-# ==========================================================
+
 
 print("\n" + "="*60)
 
