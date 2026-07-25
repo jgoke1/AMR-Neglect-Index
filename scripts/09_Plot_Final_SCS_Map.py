@@ -10,9 +10,6 @@ import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
-# =====================================================
-# PATHS
-# =====================================================
 
 BASE = Path(
     r"C:\Users\BRIDGET\Documents\Bridget\VIVLI 2026\Surveillance Capacity Score"
@@ -32,9 +29,6 @@ WORLD_FILE = (
 
 OUTPUT_FOLDER = BASE / "Outputs"
 
-# =====================================================
-# LOAD DATA
-# =====================================================
 
 print("=" * 60)
 print("FINAL SCS WORLD MAP")
@@ -63,9 +57,6 @@ if missing:
 world = gpd.read_file(WORLD_FILE)
 
 print(f"World polygons: {len(world)}")
-# =====================================================
-# MERGE SCS WITH WORLD MAP
-# =====================================================
 
 world = world.merge(
     scs,
@@ -78,9 +69,7 @@ matched = world["SCS"].notna().sum()
 
 print(f"\nMatched countries: {matched}/{len(scs)}")
 
-# =====================================================
-# REPORT ANY UNMATCHED COUNTRIES
-# =====================================================
+
 
 matched_iso = set(
     world.loc[
@@ -104,9 +93,7 @@ else:
 
     print(unmatched.to_string(index=False))
 
-# =====================================================
-# CREATE FIGURE
-# =====================================================
+
 
 fig, ax = plt.subplots(
     figsize=(18,10)
@@ -128,9 +115,6 @@ world.plot(
     },
     ax=ax
 )
-# =====================================================
-# FORMAT COLOUR BAR
-# =====================================================
 
 cbar = fig.axes[-1]
 
@@ -159,9 +143,7 @@ cbar.text(
     fontsize=10
 )
 
-# =====================================================
-# FIGURE FORMATTING
-# =====================================================
+
 
 ax.set_title(
     "Global Surveillance Capacity Score (SCS)",
@@ -173,9 +155,7 @@ ax.set_axis_off()
 
 plt.tight_layout()
 
-# =====================================================
-# SAVE FIGURE
-# =====================================================
+
 
 output_file = OUTPUT_FOLDER / "Figure_3_SCS_World_Map_FINAL.png"
 
