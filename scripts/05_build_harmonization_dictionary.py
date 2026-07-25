@@ -1,28 +1,4 @@
 """
-=========================================================
-SCRIPT 05
-Build Harmonization Dictionary
-=========================================================
-
-Input
------
-Harmonization/Harmonization_Inventory_v3.xlsx
-
-Output
-------
-Harmonization/Harmonization_Dictionary.xlsx
-
-This script:
-
-✓ Removes duplicate values
-✓ Counts occurrences
-✓ Counts datasets using each value
-✓ Creates blank Standard Value column
-✓ Creates blank Review column
-✓ Auto-adjusts column widths
-
-=========================================================
-"""
 
 from pathlib import Path
 
@@ -30,10 +6,6 @@ import pandas as pd
 
 from openpyxl.styles import Font
 
-
-# --------------------------------------------------------
-# PATHS
-# --------------------------------------------------------
 
 PROJECT = Path.cwd()
 
